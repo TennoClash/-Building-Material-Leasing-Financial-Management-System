@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bmlfms.dao.MenuDao">
+  <resultMap id="BaseResultMap" type="bmlfms.entity.Menu" >
+    <id column="menu_id" property="menuId"/>
+    <result column="menu_text" property="menuText" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="pid" property="pid"/>
+    <result column="icon" property="icon"/>
+    <result column="sort" property="sort"/>
+    <result column="state" property="state" />
+    <result column="is_leaf" property="isLeaf"/>
+    <result column="menu_type" property="menuType" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+	<select id="menuX" parameterType="int" resultMap="BaseResultMap">
+	SELECT * from menu where menu_type=#{i} order by sort;
+	</select>
+	
+	<select id="getTreeMenu" parameterType="int" resultMap="BaseResultMap">
+	SELECT menu_id,menu_text,pid from menu where menu_type=#{i} order by sort;
+	</select>
+	
+	 <update id="updateByPrimaryKeySelective" parameterType="bmlfms.entity.Menu" >
+    update menu
+    <set >
+      <if test="menuText != null" >
+        menu_text = #{menuText,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="pid !=0" >
+        pid = #{pid},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort},
+      </if>
+      <if test="state != null" >
+        state = #{state},
+      </if>
+      <if test="isLeaf !=0" >
+        is_leaf = #{isLeaf},
+      </if>
+      <if test="icon != null" >
+        icon = #{icon},
+      </if>
+      <if test="menuType != 0" >
+        menu_type = #{menuType},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime},
+      </if>
+    </set>
+    where menu_id = #{menuId}
+  </update>
+	
+	  <insert id="addMenu" parameterType="bmlfms.entity.Menu" >
+    insert into menu (menu_text, url, 
+      pid, sort, state, is_leaf,
+      menu_type, create_time, modify_time
+      )
+    values (#{menuText,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, 
+      #{pid}, #{sort}, #{state}, #{isLeaf}, 
+      #{menuType}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  
+  <update id="orderplus" parameterType="bmlfms.entity.Menu" >
+    update menu set sort = sort+1 where sort>#{sort}-1 and menu_type=#{menuType};
+</update>
+
+<update id="orderreduce" parameterType="bmlfms.entity.Menu" >
+    update menu set sort = sort-1 where sort>#{sort} and menu_type=#{menuType};
+</update>
+
+<select id="getSortById" resultType="int" parameterType="int">
+   select sort from menu where menu_id=#{param};
+</select>
+
+<delete id="deleteByPrimaryKey" parameterType="int" >
+    delete from menu
+    where menu_id = #{menuId}
+  </delete>
+
+</mapper>

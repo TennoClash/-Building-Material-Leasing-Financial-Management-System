@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bmlfms.dao.UserDao">
+  <resultMap id="BaseResultMap" type="bmlfms.entity.User_Table" >
+    <id column="user_id" property="userId" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="real_name" property="realName" jdbcType="VARCHAR" />
+    <result column="age" property="age"/>
+    <result column="gender" property="gender" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="state" property="state"/>
+    <result column="user_type" property="userType"/>
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+	<select id="getUser" parameterType="bmlfms.entity.User_Table" resultType="bmlfms.entity.User_Table">
+	SELECT * from user_table where user_name=#{userName} and password=#{password};
+	</select>
+	
+	<select id="getUserByName" parameterType="String" resultMap="BaseResultMap">
+	SELECT * from user_table where user_name=#{userName};
+	</select>
+	
+	<select id="getRole_Id" parameterType="int" resultType="Integer">
+	select role_id from user_role where user_id=#{id}
+	</select>
+	
+	  <insert id="registration" parameterType="bmlfms.entity.User_Table" >
+    insert into user_table (user_name, password, 
+      real_name, age, gender, 
+      email, state, user_type, 
+      create_time, modify_time)
+    values (#{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{realName,jdbcType=VARCHAR}, #{age}, #{gender}, 
+      #{email,jdbcType=VARCHAR}, 0, 1, 
+      #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP})
+  </insert>
+  
+   <insert id="updataUserRole" parameterType="int" >
+    insert into user_role (user_id, role_id)
+    values (#{userId,},2)
+  </insert>
+
+<select id="searchInvListT" parameterType="bmlfms.entity.Page" resultMap="BaseResultMap">
+		select * from user_table limit #{startRow},#{pageSize}
+	</select>
+
+ <select id="searchTotalCountT" parameterType="bmlfms.entity.Page"
+        resultType="java.lang.Integer">
+        select count(user_id) from user_table <where>
+            <if test="queryCondition!=null">
+                and real_name like CONCAT('%',#{queryCondition},'%')
+            </if>
+        </where>
+    </select>
+    
+    <select id="getInvBycondtionT" parameterType="bmlfms.entity.Page" resultMap="BaseResultMap">
+        select * from user_table
+         <where>
+            <if test="queryCondition!=null"> 
+                 real_name like CONCAT('%',#{queryCondition},'%')
+            </if>
+        </where>
+      </select>
+ <update id="updateUser" parameterType="bmlfms.entity.User_Table" >
+    update user_table
+    set user_name = #{userName,jdbcType=VARCHAR},
+      real_name = #{realName,jdbcType=VARCHAR},
+      age = #{age},
+      gender = #{gender},
+      email = #{email,jdbcType=VARCHAR},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where user_name = #{userName}
+  </update>
+  
+   <update id="vPass" parameterType="String" >
+    update user_table set state =1 where user_name = #{id};
+  </update>
+</mapper>
