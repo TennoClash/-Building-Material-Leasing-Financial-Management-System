@@ -19,6 +19,11 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
+	@RequestMapping("/jump/jumpuser")
+	public String jumpuser() {
+		return "jump/jumpuser";
+	}
+	
 	@RequestMapping(value = "/vpass", produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String vpass(String id) {

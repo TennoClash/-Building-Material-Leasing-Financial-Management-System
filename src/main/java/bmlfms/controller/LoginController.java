@@ -75,35 +75,39 @@ public class LoginController {
 		if (result) {
 			User_Table user = loginService.getUserByName(name);
 			int usertype = user.getUserType();
-			int user_id = user.getUserId();
-			String user_number = user.getUserName();
-			String account_name = user.getRealName();
-			Integer i = loginService.getRole_Id(user.getUserId());
+			int userstate = user.getState();
 			if (usertype == 0) {
-				User_Table user2 = loginService.getUser(name, pass);
-				session.setAttribute("user", user2);
-				session.setAttribute("account_name", account_name);
-				session.setAttribute("user_type", usertype);
-				session.setAttribute("role_id", i);
-				session.setAttribute("user_number", user_number);
-				session.setAttribute("user_id", user_id);
+				addSession(name, pass, user, session);
 				return "管理员登录成功";
 			} else {
-				User_Table user2 = loginService.getUser(name, pass);
-				session.setAttribute("user", user2);
-				session.setAttribute("account_name", account_name);
-				session.setAttribute("user_type", usertype);
-				session.setAttribute("role_id", i);
-				session.setAttribute("user_number", user_number);
-				session.setAttribute("user_id", user_id);
-				return "学员登录成功";
+				if(userstate==0) {
+					return "未审核，请等待审核通过";
+				}else {
+					if(usertype==1) {
+						addSession(name, pass, user, session);
+						return "财务人员登录成功";
+					}
+					else {
+						addSession(name, pass, user, session);
+						return "财务主管登录成功";
+					}
+				}
 			}
 		} else {
 			return "用户名或密码错误";
 		}
-
 	}
 
+	private void addSession(String name,String pass,User_Table user,HttpSession session) {
+		User_Table user2 = loginService.getUser(name, pass);
+		session.setAttribute("user", user2);
+		session.setAttribute("account_name", user.getRealName());
+		session.setAttribute("user_type", user.getUserType());
+		session.setAttribute("role_id", loginService.getRole_Id(user.getUserId()));
+		session.setAttribute("user_number", user.getUserName());
+		session.setAttribute("user_id", user.getUserId());
+	}
+	
 	@RequestMapping(value = "/getKey", produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String getKey(HttpSession session) throws NoSuchAlgorithmException {

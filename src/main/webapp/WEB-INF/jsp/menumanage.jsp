@@ -120,7 +120,7 @@
 		   }); 
 		$("#admin").attr("disabled",true);
 		$(".btn-success").on("click",function(){
-			$("#treeTable").html("");
+			$("#treeTable tbody").html("");
 			$(this).attr("disabled",true);
 			if($(this).attr('id')=="admin"){
 				var ii=1;  
@@ -140,15 +140,15 @@
 				dataType : "json",   
 				success : function(data) {
 					var $top=' <tr id="treeTitle"><th>菜单名称</th> <th>id</th> <th>排序<th><th>URL<th><th>图标<th><th>状态<th><th>操作</th></th></tr>'
-						$("#treeTable").append($top);
+						$("#treeTable tbody").append($top);
 					$.each(data,function(i,v){   
 						if(v.pid==0){ 
 							$tr='<tr data-tt-id="'+v.menuId+'"><td>'+v.menuText+'</td><td>'+v.menuId+'</td><td>'+v.sort+'</td><td></td><td>'+v.url+'</td><td></td><td><i class="'+v.icon+'"></i></td><td></td><td>'+v.state+'</td><td></td><td><a href="#myModal" id="edit" data-toggle="modal">修改 </a>/<a href="#addLevel2" id="add2" data-toggle="modal">添加菜单 </a>/<a href="#" id="mdel" data-toggle="modal">删除 </a></td></tr>';
-							$("#treeTable").append($tr);
+							$("#treeTable tbody").append($tr);
 						}if(v.children && v.children.length > 0){ 
 							$.each(v.children,function(ii,vv){ 
 								$tr2='<tr data-tt-id="'+vv.menuId+'" data-tt-parent-id="'+vv.pid+'"><td>'+vv.menuText+'</td><td>'+vv.menuId+'</td><td>'+vv.sort+'</td><td></td><td>'+vv.url+'</td><td></td><td><i class="'+vv.icon+'"></i></td><td></td><td>'+vv.state+'</td><td></td><td><a href="#myModal" id="edit" data-toggle="modal">修改 </a>/<a href="#addLevel2" id="add2" data-toggle="modal">添加菜单 </a>/<a href="#" id="mdel" data-toggle="modal">删除 </a></td></tr>';
-								$("#treeTable").append($tr2);
+								$("#treeTable tbody").append($tr2);
 							}) 
 						}	
 						 
@@ -196,12 +196,7 @@
 							}
 							
 						})
-						$("#treeTable").treetable({  
-					         expandable : true,
-					         initialState:"expanded",
-					         clickableNodeNames:true,//点击节点名称也打开子节点.
-					         indent : 30//每个分支缩进的像素数。
-					     });
+						
 					}, 
 					error : function() { 
 						
