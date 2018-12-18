@@ -1,9 +1,15 @@
 package bmlfms.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Role {
-    private int roleId;
+public class Role implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7278439394793626423L;
+
+	private int roleId;
 
     private String roleName;
 

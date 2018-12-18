@@ -1,14 +1,20 @@
 package bmlfms.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 
-public class Menu {
+public class Menu implements Serializable{
 
-    private int menuId;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1760611195813754330L;
+
+	private int menuId;
 
     private String menuText;
 

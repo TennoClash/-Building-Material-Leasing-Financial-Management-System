@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans	
@@ -12,31 +12,95 @@
 	http://www.springframework.org/schema/context/spring-context.xsd	
 	http://www.springframework.org/schema/tx 	
 	http://www.springframework.org/schema/tx/spring-tx.xsd">
-	
-	
-	<bean id="propertyConfigurer"
-	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-	<property name="location" value="classpath:jdbc.properties" />
-</bean>
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-	destroy-method="close">
-	<property name="driverClassName" value="${jdbc.driver}" />
-	<property name="url" value="${jdbc.url}" />
-	<property name="username" value="${jdbc.username}" />
-	<property name="password" value="${jdbc.password}" />
-	<!-- 事务是否自动提交 -->
-	<property name="defaultAutoCommit" value="${defaultAutoCommit}"></property>
-</bean>
 
-<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-	<property name="dataSource" ref="dataSource" />
-	<!-- 自动扫描mapping.xml文件 -->
-	<property name="mapperLocations" value="classpath:bmlfms/mapper/*.xml"></property>
-</bean>
-<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
-        <property name="basePackage" value="bmlfms.dao" />  
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>  
-    </bean>  
 
-	
-	</beans>
+	<!-- <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
+		<property name="location" value="classpath:jdbc.properties" /> 
+		<property name="locations" value="classpath:redis.properties" /> 
+		</bean> -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+				<value>classpath:redis.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- redis -->
+	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxIdle" value="${redis.maxIdle}" />
+		<property name="maxTotal" value="100" />
+		<property name="maxWaitMillis" value="${redis.maxWait}" />
+		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
+	</bean>
+	<!-- redis服务器中心 -->
+	<bean id="connectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${redis.host}"></property>
+		<property name="port" value="${redis.port}"></property>
+		<property name="password" value="${redis.pass}"></property>
+		<property name="poolConfig" ref="poolConfig"></property>
+		<property name="timeout" value="${redis.timeout}"></property>
+	</bean>
+	<bean id="redisTemplate"
+		class=" org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="connectionFactory"></property>
+
+		<!-- 如果不配置Serializer，那么存储的时候智能使用String，如果用User类型存储，那么会提示错误User can't cast 
+			to String -->
+		<property name="keySerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+		</property>
+	</bean>
+	<!-- cache配置 -->
+	<bean id="methodCacheInterceptor"
+		class="bmlfms.util.MethodCacheInterceptor">
+		<property name="redisUtil" ref="redisUtil" />
+	</bean>
+	<bean id="redisUtil" class="bmlfms.util.RedisUtil">
+		<property name="redisTemplate" ref="redisTemplate" />
+	</bean>
+	<!--配置切面拦截方法 -->
+	<aop:config proxy-target-class="true">
+		<!--将com.test.service包下的所有select开头的方法加入拦截去掉select则加入所有方法 -->
+		<aop:pointcut id="controllerMethodPointcut"
+			expression="execution(* bmlfms.service.*.*(..))" />
+		<aop:pointcut id="selectMethodPointcut"
+			expression="execution(* bmlfms.mapper.*.*(..))" />
+		<aop:advisor advice-ref="methodCacheInterceptor"
+			pointcut-ref="controllerMethodPointcut" />
+	</aop:config>
+
+
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<!-- 事务是否自动提交 -->
+		<property name="defaultAutoCommit"
+			value="${defaultAutoCommit}"></property>
+	</bean>
+
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations"
+			value="classpath:bmlfms/mapper/*.xml"></property>
+	</bean>
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="bmlfms.dao" />
+		<property name="sqlSessionFactoryBeanName"
+			value="sqlSessionFactory"></property>
+	</bean>
+
+</beans>

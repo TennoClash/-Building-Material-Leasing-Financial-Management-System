@@ -1,6 +1,12 @@
 package bmlfms.entity;
 
-public class KeyU {
+import java.io.Serializable;
+
+public class KeyU implements Serializable{
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5445114851292158796L;
 private String Modulus;
 private String Exponent;
 public String getModulus() {

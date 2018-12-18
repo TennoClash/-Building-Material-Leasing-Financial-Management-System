@@ -12,10 +12,9 @@
 	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
 	http://www.springframework.org/schema/task 
 	http://www.springframework.org/schema/task/spring-task-3.2.xsd">
-
 <task:annotation-driven/>
 
-	<context:component-scan base-package="oss.controller"></context:component-scan>
+	<context:component-scan base-package="bmlfms.controller"></context:component-scan>
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/jsp/"></property>

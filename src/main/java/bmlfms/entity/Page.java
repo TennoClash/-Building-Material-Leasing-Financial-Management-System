@@ -1,6 +1,12 @@
 package bmlfms.entity;
 
-public class Page {
+import java.io.Serializable;
+
+public class Page implements Serializable{
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7840501221495174031L;
 int pageSize;
 int currentPage;
 int startRow;

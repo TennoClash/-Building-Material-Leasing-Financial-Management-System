@@ -1,7 +1,14 @@
 package bmlfms.entity;
 
-public class User_RoleKey {
-    private int userId;
+import java.io.Serializable;
+
+public class User_RoleKey implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4415853109312939910L;
+
+	private int userId;
 
     private int roleId;
 

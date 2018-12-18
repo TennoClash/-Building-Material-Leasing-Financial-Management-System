@@ -1,9 +1,15 @@
 package bmlfms.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class User_Table {
-    private int userId;
+public class User_Table implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7411418330610442947L;
+
+	private int userId;
 
     private String userName;
 

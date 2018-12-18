@@ -3,6 +3,8 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="bmlfms.dao.UserDao">
+<cache type="bmlfms.util.RedisCache" />
+
   <resultMap id="BaseResultMap" type="bmlfms.entity.User_Table" >
     <id column="user_id" property="userId" />
     <result column="user_name" property="userName" jdbcType="VARCHAR" />
@@ -17,15 +19,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
   </resultMap>
   
-	<select id="getUser" parameterType="bmlfms.entity.User_Table" resultType="bmlfms.entity.User_Table">
+	<select id="getUser" parameterType="bmlfms.entity.User_Table" resultType="bmlfms.entity.User_Table" useCache="true">
 	SELECT * from user_table where user_name=#{userName} and password=#{password};
 	</select>
 	
-	<select id="getUserByName" parameterType="String" resultMap="BaseResultMap">
+	<select id="getUserByName" parameterType="String" resultMap="BaseResultMap" useCache="true">
 	SELECT * from user_table where user_name=#{userName};
 	</select>
 	
-	<select id="getRole_Id" parameterType="int" resultType="Integer">
+	<select id="getRole_Id" parameterType="int" resultType="Integer" useCache="true">
 	select role_id from user_role where user_id=#{id}
 	</select>
 	
@@ -45,12 +47,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     values (#{userId,},2)
   </insert>
 
-<select id="searchInvListT" parameterType="bmlfms.entity.Page" resultMap="BaseResultMap">
+<select id="searchInvListT" parameterType="bmlfms.entity.Page" resultMap="BaseResultMap" useCache="true">
 		select * from user_table limit #{startRow},#{pageSize}
 	</select>
 
  <select id="searchTotalCountT" parameterType="bmlfms.entity.Page"
-        resultType="java.lang.Integer">
+        resultType="java.lang.Integer" useCache="true">
         select count(user_id) from user_table <where>
             <if test="queryCondition!=null">
                 and real_name like CONCAT('%',#{queryCondition},'%')
@@ -58,7 +60,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="getInvBycondtionT" parameterType="bmlfms.entity.Page" resultMap="BaseResultMap">
+    <select id="getInvBycondtionT" parameterType="bmlfms.entity.Page" resultMap="BaseResultMap" useCache="true">
         select * from user_table
          <where>
             <if test="queryCondition!=null"> 
